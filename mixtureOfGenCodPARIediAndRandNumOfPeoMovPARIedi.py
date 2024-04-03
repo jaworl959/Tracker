@@ -48,7 +48,7 @@ def main():
     root = tk.Tk()
     root.title("Map Viewer")
     root.geometry("800x400")
-    root.configure(bg="pumpkin")
+    root.configure(bg="lightblue")
 
     # Your code for generating map and setting up matplotlib canvas
 
