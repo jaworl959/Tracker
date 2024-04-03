@@ -62,11 +62,11 @@ def main():
     info_text.grid(row=0, column=1, padx=10, pady=10)
 
     # Timer label
-    timer_label = tk.Label(root, text="Time: 08:00:00", font=("Arial", 12))
+    timer_label = tk.Label(root, text="Time: 08:00:00", font=("Arial", 16))
     timer_label.grid(row=1, column=0, padx=10, pady=10)
 
     # Day label
-    day_label = tk.Label(root, text="Day: Saturday", font=("Arial", 12))
+    day_label = tk.Label(root, text="Day: Saturday", font=("Arial", 16))
     day_label.grid(row=1, column=1, padx=10, pady=10)
 
     # Horizontal slider to adjust speed
@@ -81,7 +81,7 @@ def main():
     speed_scale.set(1000)  # Default speed: 1x
     speed_scale.grid(row=2, column=0, padx=10, pady=10)
 
-    speed_label = tk.Label(root, text=f"Speed: {1000/1000:.1f}x", font=("Arial", 12))
+    speed_label = tk.Label(root, text=f"Speed: {1000/1000:.1f}x", font=("Arial", 16))
     speed_label.grid(row=3, column=0, padx=10, pady=10)
 
     # Function to update the timer
