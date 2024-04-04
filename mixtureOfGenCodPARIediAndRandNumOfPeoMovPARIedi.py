@@ -7,7 +7,6 @@ import random
 from datetime import datetime
 import pygame
 from PIL import Image, ImageTk
-import sys
 
 def generate_random_map(size):
     return [[random.randint(0, 1) for _ in range(size)] for _ in range(size)]
@@ -87,6 +86,34 @@ def main():
     # Create info_text widget
     info_text = tk.Text(root, height=10, width=30)
     info_text.grid(row=0, column=1, padx=10, pady=10)
+
+    timer_label = tk.Label(root, text="Time: 08:00:00", font=("Arial", 16))
+    timer_label.grid(row=1, column=0, padx=10, pady=10)
+
+    # Day label
+    day_label = tk.Label(root, text="Day: Saturday", font=("Arial", 16))
+    day_label.grid(row=2, column=0, padx=10, pady=10)
+
+    # Initialize timer and day count
+    timer_value = 8 * 3600   # Initial timer value (8:00:00)
+    current_day = 5  # Saturday (0: Monday, 1: Tuesday, ..., 5: Saturday)
+
+    def update_timer():
+        nonlocal timer_value
+        nonlocal current_day
+        timer_value += 1
+        if timer_value % (24 * 3600) == 0:  # If timer reaches 24 hours
+            timer_value = 8 * 3600  # Reset timer to 8:00:00
+            current_day = (current_day + 1) % 7  # Increment day by 1 (cycling from 0 to 6)
+            days_of_week = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+            day_label.config(text=f"Day: {days_of_week[current_day]}")
+        hours = (timer_value // 3600) % 24  # Extract hours
+        minutes = (timer_value % 3600) // 60  # Extract minutes
+        seconds = timer_value % 60  # Extract seconds
+        timer_label.config(text=f"Time: {hours:02d}:{minutes:02d}:{seconds:02d}")
+        root.after(1000, update_timer)  # Update after 1 second (1000 milliseconds)
+
+    update_timer()  # Start the timer
 
     def draw_squares(screen):
         for square in squares:
