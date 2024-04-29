@@ -7,8 +7,11 @@ from tkinter import messagebox
 import random
 from datetime import datetime
 import pygame
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk, ImageDraw
 
+SPEED = 1000
+
+#TODO: use functions
 def plot_map(ax, map_array, circles, selected_circle_index):
     ax.clear()
     ax.imshow(map_array, cmap='binary', interpolation='nearest')
@@ -41,6 +44,10 @@ def move_circles(circles, map_array):
         new_circles.append((new_x, new_y))
     return new_circles
 
+def generate_data():
+    pass
+
+
 def main():
     root = tk.Tk()
     root.title("OPAL PROJECT")
@@ -65,14 +72,14 @@ def main():
 
     # Load the image
     try:
-        image_path = "C:/Users/LOOP/Downloads/MAP.png"
+        image_path = "./Tracker/static/MAP.png"
         image = pygame.image.load(image_path)
         print("Image loaded successfully!")
         # Process your image here
     except Exception as e:
         messagebox.showerror("Error", f"Failed to load image from {image_path}: {str(e)}")
         return  # Stop the function if image fails to load
-    image = pygame.image.load("C:/Users/LOOP/Downloads/MAP.png")
+    image = pygame.image.load("./Tracker/static/MAP.png")
     original_width, original_height = image.get_size()
     resized_width, resized_height = original_width // 3 * 2, original_height // 3 * 2
     image = pygame.transform.scale(image, (resized_width, resized_height))
@@ -86,18 +93,41 @@ def main():
     EDENEF = (237, 237, 239)
 
     # Find all #EDENEF pixels in the image
-    ededef_pixels = []
+    edenef_pixels = []
     for y in range(resized_height):
         for x in range(resized_width):
             if image.get_at((x, y)) == EDENEF:
-                ededef_pixels.append((x, y))
+                edenef_pixels.append((x, y))
+    
+    # Find all Blue pixels in the image
+    BLUE = (63, 72, 204)
+    blue_pixels = []
+    for y in range(resized_height):
+        for x in range(resized_width):
+            if image.get_at((x, y)) == BLUE:
+                blue_pixels.append((x, resized_height-y))
+
+    # # negerate wall image
+    # b_image = Image.new("RGB", (resized_width, resized_height), "white")
+    # b_draw = ImageDraw.Draw(b_image)
+    # for x, y in blue_pixels:
+    #     b_draw.point((x, y), fill="blue")
+    # b_image.show()
+
+    #TODO: add recursive function to detect walls
+    #TODO: append walls to shop object
+
+    #TODO: add pathfinding function for customers
+
+    #? later: add clustering for walls
+
 
     # Movement variables
     square_size = 5
     squares = []
     num_squares = random.randint(5, 100)  # Choose a random number of squares between 5 and 100
     for _ in range(num_squares):
-        start_x, start_y = random.choice(ededef_pixels)
+        start_x, start_y = random.choice(edenef_pixels)
         squares.append(pygame.Rect(start_x, start_y, square_size, square_size))
 
     # Create a frame for the map image with a red border
@@ -127,12 +157,11 @@ def main():
     # Initialize timer and day count
     timer_value = 8 * 3600  # Initial timer value (8:00:00)
     current_day = 5  # Saturday (0: Monday, 1: Tuesday, ..., 5: Saturday)
-
     # Horizontal slider to adjust speed
     def change_speed(value):
-        global timer_speed
+        global SPEED
         coefficient = int(value) / 1000
-        timer_speed = int(1000 / coefficient)  # Update timer speed based on slider value
+        SPEED = int(value)  # Update timer speed based on slider value
         speed_label.config(text=f"Speed: {coefficient:.1f}x")
 
     speed_scale = tk.Scale(root, from_=500, to=20000, orient=tk.HORIZONTAL, resolution=100, length=300,
@@ -144,6 +173,7 @@ def main():
     speed_label.grid(row=4, column=0, padx=10, pady=10)
 
     # Create info_text widget
+    # TODO: change tk.Text to tk.Label
     info_text = tk.Text(root, height=33, width=30, highlightthickness=5, highlightbackground="deepskyblue")
     info_text.grid(row=0, column=10, padx=10, pady=10)
 
@@ -160,7 +190,7 @@ def main():
         minutes = (timer_value % 3600) // 60  # Extract minutes
         seconds = timer_value % 60  # Extract seconds
         timer_label.config(text=f"Time: {hours:02d}:{minutes:02d}:{seconds:02d}")
-        root.after(1000, update_timer)  # Update after 1 second (1000 milliseconds)
+        root.after(int(1000/(SPEED/1000)), update_timer)  # Update after 1 second (1000 milliseconds)
 
     update_timer()  # Start the timer
 
@@ -184,8 +214,9 @@ def main():
 
         # Move the squares
         for square in squares:
-            move_x = random.randint(-10, 10)  # Wider random movements
-            move_y = random.randint(-10, 10)
+            speed = SPEED // 1000
+            move_x = random.randint(-speed, speed)  # Wider random movements
+            move_y = random.randint(-speed, speed)
             new_square = square.move(move_x, move_y)
 
             new_square.centerx = np.clip(new_square.centerx, 0, resized_width - 1)
@@ -228,3 +259,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
